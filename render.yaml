@@ -1,0 +1,25 @@
+# Render Blueprint — define o Static Site do frontend.
+# Este repositório (TreinoTrack-Web) é independente do repositório da API
+# (TreinoTrack-Back), que tem seu próprio deploy (Web Service + Postgres)
+# e seu próprio render.yaml.
+# No dashboard do Render: New > Blueprint > aponte para este repositório.
+
+services:
+  - type: web
+    name: treinotrack-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://treinotrack-api.onrender.com/api
+        # ⚠️ Ajuste para a URL real da API depois do primeiro deploy — variáveis VITE_*
+        # são embutidas em BUILD TIME, então um redeploy do front é necessário após corrigir.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+        # Necessário para React Router funcionar em URLs diretas (ex.: /progresso) —
+        # sem isso, refresh numa rota que não seja "/" retorna 404.
