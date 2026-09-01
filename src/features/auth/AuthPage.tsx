@@ -24,10 +24,11 @@ export function AuthPage() {
     try {
       if (mode === "login") {
         await login(email, password);
+        navigate(redirectTo, { replace: true });
       } else {
         await register(email, password);
+        navigate("/plano", { replace: true });
       }
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError((err as Error).message || "Não foi possível continuar. Tente novamente.");
     } finally {
