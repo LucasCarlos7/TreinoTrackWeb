@@ -1,5 +1,6 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TrainingPage } from "./TrainingPage";
 import { trainingApi } from "./api";
@@ -71,5 +72,20 @@ describe("TrainingPage", () => {
         expect.objectContaining({ exerciseName: "Supino", loadKg: 80, repsPerformed: 10 })
       )
     );
+  });
+
+  it("redireciona para /plano quando não há divisão de treino ativa", async () => {
+    vi.mocked(trainingApi.getActiveSplit).mockResolvedValue(null);
+
+    renderWithClient(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<TrainingPage />} />
+          <Route path="/plano" element={<div>Página de geração de plano</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText("Página de geração de plano")).toBeInTheDocument();
   });
 });

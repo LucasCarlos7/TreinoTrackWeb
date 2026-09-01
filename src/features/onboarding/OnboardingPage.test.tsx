@@ -50,12 +50,40 @@ describe("OnboardingPage", () => {
 
     await waitFor(() =>
       expect(onboardingApi.complete).toHaveBeenCalledWith(
-        expect.objectContaining({ weightKg: 80, heightCm: 180, age: 28, sex: 1, objective: 1 })
+        expect.objectContaining({
+          weightKg: 80, heightCm: 180, age: 28, sex: 1, objective: 1,
+          level: 1, availableEquipment: 1,
+        })
       )
     );
 
     expect(await screen.findByText("Plano gerado!")).toBeInTheDocument();
     expect(screen.getByText("2500 kcal/dia")).toBeInTheDocument();
+  });
+
+  it("envia nível de experiência e equipamentos selecionados no payload", async () => {
+    const user = userEvent.setup();
+    vi.mocked(onboardingApi.complete).mockResolvedValue(result);
+
+    renderWithClient(
+      <MemoryRouter>
+        <OnboardingPage />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText("Peso (kg)"), "70");
+    await user.type(screen.getByLabelText("Altura (cm)"), "171");
+    await user.type(screen.getByLabelText("Idade"), "26");
+    await user.selectOptions(screen.getByLabelText("Nível de experiência"), "2");
+    await user.click(screen.getByLabelText("Halteres"));
+    await user.click(screen.getByLabelText("Barra"));
+    await user.click(screen.getByRole("button", { name: "Gerar plano" }));
+
+    await waitFor(() =>
+      expect(onboardingApi.complete).toHaveBeenCalledWith(
+        expect.objectContaining({ level: 2, availableEquipment: 1 | 2 | 4 })
+      )
+    );
   });
 
   it("mostra erro quando a geração do plano falha", async () => {

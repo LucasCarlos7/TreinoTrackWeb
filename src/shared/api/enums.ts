@@ -1,6 +1,7 @@
 import type {
   ActivityLevel,
   ChecklistCategory,
+  ExperienceLevel,
   FitnessObjective,
   GoalMetric,
   GoalPeriod,
@@ -28,6 +29,29 @@ export const FITNESS_OBJECTIVE_OPTIONS: { value: FitnessObjective; label: string
   { value: 3, label: "Recomposição corporal" },
   { value: 4, label: "Resistência cardiorrespiratória" },
   { value: 5, label: "Saúde geral" },
+];
+
+export const EXPERIENCE_LEVEL_OPTIONS: { value: ExperienceLevel; label: string }[] = [
+  { value: 1, label: "Iniciante" },
+  { value: 2, label: "Intermediário" },
+  { value: 3, label: "Avançado" },
+];
+
+// Equipment é um enum de flags — cada opção é um bit independente que pode ser
+// combinado por OR (ex.: Halteres(2) | Barra(4) = 6) para representar múltiplos
+// equipamentos disponíveis ao mesmo tempo.
+export const EQUIPMENT_OPTIONS: { value: number; label: string }[] = [
+  { value: 1, label: "Peso corporal" },
+  { value: 2, label: "Halteres" },
+  { value: 4, label: "Barra" },
+  { value: 8, label: "Máquina" },
+  { value: 16, label: "Cabo/Polia" },
+  { value: 32, label: "Kettlebell" },
+  { value: 64, label: "Elástico" },
+  { value: 128, label: "Bola suíça" },
+  { value: 256, label: "Medicine ball" },
+  { value: 512, label: "Foam roll" },
+  { value: 1024, label: "Barra EZ" },
 ];
 
 export const WORKOUT_DAY_TYPE_LABELS: Record<WorkoutDayType, string> = {

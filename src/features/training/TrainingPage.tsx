@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { trainingApi } from "./api";
 import { SkeletonCard } from "@/shared/components/Skeleton";
-import { EmptyState } from "@/shared/components/EmptyState";
 import { WORKOUT_DAY_TYPE_LABELS } from "@/shared/api/enums";
 
 const ACTIVE_WEEK_STORAGE_KEY = "treinotrack:activeWeekId";
@@ -32,14 +31,7 @@ export function TrainingPage() {
   }
   if (isError) return <div className="page-state page-state--error">{(error as Error).message}</div>;
   if (!split) {
-    return (
-      <div className="page page--treino">
-        <EmptyState icon="🏋️" title="Nenhuma divisão de treino ativa." />
-        <p className="field-hint empty-state-cta">
-          <Link to="/plano">Gerar um plano personalizado</Link> a partir dos seus dados.
-        </p>
-      </div>
-    );
+    return <Navigate to="/plano" replace state={{ reason: "no-active-split" }} />;
   }
 
   return (

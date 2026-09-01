@@ -10,6 +10,7 @@ export interface AuthResponseDto {
 export type Sex = 1 | 2;
 export type ActivityLevel = 1 | 2 | 3 | 4 | 5;
 export type FitnessObjective = 1 | 2 | 3 | 4 | 5;
+export type ExperienceLevel = 1 | 2 | 3;
 
 export interface CompleteOnboardingRequest {
   sex: Sex;
@@ -19,6 +20,10 @@ export interface CompleteOnboardingRequest {
   activityLevel: ActivityLevel;
   objective: FitnessObjective;
   daysPerWeek: number;
+  level: ExperienceLevel;
+  // Equipment é um enum de flags (.NET [Flags]) — o valor enviado é o OR bit a bit
+  // dos equipamentos selecionados (ex.: Halteres(2) | Barra(4) = 6).
+  availableEquipment: number;
 }
 
 export interface OnboardingResultDto {

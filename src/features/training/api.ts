@@ -2,8 +2,8 @@ import { apiClient } from "@/shared/api/client";
 import type { ProgressionCycleDto, WorkoutSplitDto } from "@/shared/api/types";
 
 export const trainingApi = {
-  getActiveSplit: async (): Promise<WorkoutSplitDto> => {
-    const { data } = await apiClient.get<WorkoutSplitDto>("/training/splits/active");
+  getActiveSplit: async (): Promise<WorkoutSplitDto | null> => {
+    const { data } = await apiClient.get<WorkoutSplitDto | null>("/training/splits/active");
     return data;
   },
 

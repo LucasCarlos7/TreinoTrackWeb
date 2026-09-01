@@ -1,13 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { onboardingApi } from "./api";
-import { ACTIVITY_LEVEL_OPTIONS, FITNESS_OBJECTIVE_OPTIONS, SEX_OPTIONS } from "@/shared/api/enums";
-import type { ActivityLevel, FitnessObjective, OnboardingResultDto, Sex } from "@/shared/api/types";
+import {
+  ACTIVITY_LEVEL_OPTIONS,
+  EQUIPMENT_OPTIONS,
+  EXPERIENCE_LEVEL_OPTIONS,
+  FITNESS_OBJECTIVE_OPTIONS,
+  SEX_OPTIONS,
+} from "@/shared/api/enums";
+import type { ActivityLevel, ExperienceLevel, FitnessObjective, OnboardingResultDto, Sex } from "@/shared/api/types";
 
 export function OnboardingPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const location = useLocation();
+  const cameFromEmptyTraining = (location.state as { reason?: string } | null)?.reason === "no-active-split";
 
   const [sex, setSex] = useState<Sex>(1);
   const [weightKg, setWeightKg] = useState("");
@@ -16,7 +24,15 @@ export function OnboardingPage() {
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(3);
   const [objective, setObjective] = useState<FitnessObjective>(1);
   const [daysPerWeek, setDaysPerWeek] = useState("4");
+  const [level, setLevel] = useState<ExperienceLevel>(1);
+  const [availableEquipment, setAvailableEquipment] = useState<number[]>([1]);
   const [result, setResult] = useState<OnboardingResultDto | null>(null);
+
+  const toggleEquipment = (value: number) => {
+    setAvailableEquipment((current) =>
+      current.includes(value) ? current.filter((v) => v !== value) : [...current, value]
+    );
+  };
 
   const complete = useMutation({
     mutationFn: () =>
@@ -28,6 +44,8 @@ export function OnboardingPage() {
         activityLevel,
         objective,
         daysPerWeek: Number.parseInt(daysPerWeek, 10),
+        level,
+        availableEquipment: availableEquipment.reduce((acc, flag) => acc | flag, 0),
       }),
     onSuccess: (data) => {
       setResult(data);
@@ -61,6 +79,11 @@ export function OnboardingPage() {
   return (
     <div className="page page--plano">
       <h1>Gerar meu plano</h1>
+      {cameFromEmptyTraining && (
+        <p className="page-state page-state--error">
+          Você ainda não tem um treino ativo. Preencha os dados abaixo para gerar seu plano.
+        </p>
+      )}
       <p className="field-hint">
         A partir dos seus dados calculamos automaticamente suas metas de calorias e macros, uma
         meta de peso para os próximos 3 meses, e sugerimos uma divisão de treino. Isso substitui
@@ -133,6 +156,33 @@ export function OnboardingPage() {
               className="text-input" type="number" min="1" max="7" required
               value={daysPerWeek} onChange={(e) => setDaysPerWeek(e.target.value)}
             />
+          </label>
+
+          <label>
+            <span>Nível de experiência</span>
+            <select
+              className="select-input"
+              value={level}
+              onChange={(e) => setLevel(Number(e.target.value) as ExperienceLevel)}
+            >
+              {EXPERIENCE_LEVEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </label>
+
+          <label>
+            <span>Equipamento disponível</span>
+            <div className="checkbox-group">
+              {EQUIPMENT_OPTIONS.map((o) => (
+                <label key={o.value} className="checkbox-group__item">
+                  <input
+                    type="checkbox"
+                    checked={availableEquipment.includes(o.value)}
+                    onChange={() => toggleEquipment(o.value)}
+                  />
+                  <span>{o.label}</span>
+                </label>
+              ))}
+            </div>
           </label>
 
           {complete.isError && (
